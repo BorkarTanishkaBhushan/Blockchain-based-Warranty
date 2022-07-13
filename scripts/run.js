@@ -15,7 +15,7 @@ const main = async () => {
     console.log("DOne registered")
 
     //buying transaction
-    const b_tx = await warrantyContract.buyProduct(1,  {value: hre.ethers.utils.parseEther('20')}); //since function is payable we are passing ether
+    const b_tx = await warrantyContract.connect(randomPerson).buyProduct(1,  {value: hre.ethers.utils.parseEther('20')}); //since function is payable we are passing ether
     await b_tx.wait();
     console.log("Done bought")
 }

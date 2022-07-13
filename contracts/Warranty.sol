@@ -1,5 +1,6 @@
 //SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.5.0 < 0.9.0;
+import "hardhat/console.sol";
 
 contract Warranty  {
 
@@ -34,13 +35,15 @@ contract Warranty  {
         tempProduct.productId = counter;
         products.push(tempProduct);
         counter++;
+        console.log("Seller: ", msg.sender);
         emit registered(_title, tempProduct.productId, msg.sender);
     }
 
     function buyProduct(uint _productId) payable public {
         require(products[_productId - 1].price == msg.value, "Please pay the exact amount!");
-        require(products[_productId - 1].seller == msg.sender, "Seller cannot buy the product");
+        require(products[_productId - 1].seller != msg.sender, "Seller cannot buy the product");
         products[_productId - 1].buyer = msg.sender;
+        console.log("Buyer: ", msg.sender);
         emit bought(_productId, msg.sender);
     }
 
