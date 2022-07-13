@@ -8,10 +8,16 @@ const main = async () => {
     console.log("Contract deployed by:", owner.address);
 
     //calling contract functions
-    const r_tx = await warrantyContract.registerProduct("Krishna Idol", "Golden and black in color", "7189", "20");
-    await r_tx.wait();
 
-    
+    //register transaction
+    const r_tx = await warrantyContract.registerProduct("Krishna Idol", "Golden and black in color", 7189, 20);
+    await r_tx.wait();
+    console.log("DOne registered")
+
+    //buying transaction
+    const b_tx = await warrantyContract.buyProduct(1,  {value: hre.ethers.utils.parseEther('20')}); //since function is payable we are passing ether
+    await b_tx.wait();
+    console.log("Done bought")
 }
 
 const runMain = async () => {
