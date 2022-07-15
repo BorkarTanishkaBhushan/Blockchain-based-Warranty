@@ -14,14 +14,17 @@ const main = async () => {
     console.log("Done, product registered")
 
     //buying transaction
-    let b_tx = await warrantyContract.buyProduct(1,  {value: hre.ethers.utils.parseEther('0.2')}); //since function is payable we are passing ether
+    let b_tx = await warrantyContract.connect(randomPerson).buyProduct(1,  {value: hre.ethers.utils.parseEther('0.2')}); //since function is payable we are passing ether
     await b_tx.wait();
     console.log("Done, product bought")
 
     const balance = await hre.ethers.provider.getBalance(warrantyContract.address);
     console.log("Contract balance:", hre.ethers.utils.formatEther(balance));
 
-    //add delivery tx
+    //delivery transaction
+    let d_tx = await warrantyContract.connect(randomPerson).delivery(1);
+    await d_tx.wait();
+    console.log("Done delivered");
 }
 
 const runMain = async () => {

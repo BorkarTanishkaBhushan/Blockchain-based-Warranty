@@ -18,6 +18,11 @@ const main = async () => {
     const b_tx = await warrantyContract.connect(randomPerson).buyProduct(1,  {value: hre.ethers.utils.parseEther('0.2')}); //since function is payable we are passing ether
     await b_tx.wait();
     console.log("Done bought")
+
+    //delivery transaction
+    const d_tx = await warrantyContract.connect(randomPerson).delivery(1);
+    await d_tx.wait();
+    console.log("Done delivered");
 }
 
 const runMain = async () => {
