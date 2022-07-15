@@ -11,6 +11,7 @@ contract Warranty  is ERC721URIStorage {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
+
     constructor(string memory _name) payable ERC721("Product Warranty", "blockchian--based") {
     console.log("%s service deployed", _name);
     }
@@ -24,6 +25,9 @@ contract Warranty  is ERC721URIStorage {
         uint price;
         address buyer;
         bool delivered;
+        //creation time of warranty
+        uint warrantyStartTime;
+        uint warrantyExpiryTime;
         //include warranty start and expiry
     }
 
@@ -39,7 +43,7 @@ contract Warranty  is ERC721URIStorage {
     event bought(uint productId, address buyer);
     event delivered(uint productId);
 
-    function registerProduct(string memory _title, string memory _desc, uint _prodSerialNo, uint _price) public {
+    function registerProduct(string memory _title, string memory _desc, uint _prodSerialNo, uint _price, uint _warrantyPeriodDays) public {
         require(_price > 0, "Price should be greater than zero!");
         Product memory tempProduct;
         tempProduct.title = _title;
@@ -49,6 +53,8 @@ contract Warranty  is ERC721URIStorage {
         tempProduct.prodSerialNo = _prodSerialNo;  
         tempProduct.seller = payable(msg.sender);
         tempProduct.productId = counter;
+        tempProduct.warrantyStartTime = block.timestamp;
+        tempProduct.warrantyExpiryTime = block.timestamp + _warrantyPeriodDays * 86400;
         products.push(tempProduct);
         
 
@@ -104,5 +110,6 @@ contract Warranty  is ERC721URIStorage {
         emit delivered(_productId);
     }
 
+    
     
 }

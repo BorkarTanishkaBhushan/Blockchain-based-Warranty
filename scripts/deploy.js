@@ -9,7 +9,7 @@ const main = async () => {
     //calling contract functions
 
     //register transaction
-    let r_tx = await warrantyContract.registerProduct("Krishna Idol", "Golden and black in color", 7189, 2);
+    let r_tx = await warrantyContract.registerProduct("Krishna Idol", "Golden and black in color", 7189, 2, 45);
     await r_tx.wait();
     console.log("Done, product registered")
 
