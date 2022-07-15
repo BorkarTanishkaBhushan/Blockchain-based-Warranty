@@ -11,9 +11,9 @@ contract Warranty  is ERC721URIStorage {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
-    constructor() payable ERC721("Product Warranty", "blockchian--based") {
-    console.log("Blockchain based warranty service deployed");
-  }
+    constructor(string memory _name) payable ERC721("Product Warranty", "blockchian--based") {
+    console.log("%s service deployed", _name);
+    }
 
     struct Product{
         string title;
@@ -44,12 +44,25 @@ contract Warranty  is ERC721URIStorage {
         Product memory tempProduct;
         tempProduct.title = _title;
         tempProduct.desc = _desc;
-        tempProduct.price = _price * 10**18; //ether to Wei
+        tempProduct.price = _price * 10**17; //ether to Wei
+        console.log("price:", tempProduct.price);
         tempProduct.prodSerialNo = _prodSerialNo;  
         tempProduct.seller = payable(msg.sender);
         tempProduct.productId = counter;
         products.push(tempProduct);
-        string memory _prodSerialNoInStr = Strings.toString(_prodSerialNo);
+        
+
+        counter++;
+        console.log("Seller: ", msg.sender);
+        emit registered(_title, tempProduct.productId, msg.sender);
+    }
+
+    function buyProduct(uint _productId) payable public {
+        require(products[_productId - 1].price >= msg.value, "Please pay the exact amount!");
+        require(products[_productId - 1].seller != msg.sender, "Seller cannot buy the product"); //later change == to !=
+        products[_productId - 1].buyer = msg.sender;
+
+        string memory _prodSerialNoInStr = Strings.toString(products[_productId - 1].prodSerialNo);
         // Creating the SVG (image) for the NFT with the product serial no
         string memory finalSvg = string(abi.encodePacked(svgPartOne, _prodSerialNoInStr, svgPartTwo));
         uint256 newRecordId = _tokenIds.current();
@@ -61,13 +74,13 @@ contract Warranty  is ERC721URIStorage {
     string memory json = Base64.encode(
       abi.encodePacked(
         '{"title": "',
-        _title,
-        '", "description": _desc, "image": "data:image/svg+xml;base64,',
+        products[_productId - 1].title,
+        '", "description": "Blockchain-based-Warranty", "image": "data:image/svg+xml;base64,',
         Base64.encode(bytes(finalSvg)),
         '","serialno":"',
         _prodSerialNoInStr,
         '"}'
-      )
+    )
     );
 
         string memory finalTokenUri = string( abi.encodePacked("data:application/json;base64,", json));
@@ -80,15 +93,6 @@ contract Warranty  is ERC721URIStorage {
         _setTokenURI(newRecordId, finalTokenUri);
         _tokenIds.increment(); 
         
-        counter++;
-        console.log("Seller: ", msg.sender);
-        emit registered(_title, tempProduct.productId, msg.sender);
-    }
-
-    function buyProduct(uint _productId) payable public {
-        require(products[_productId - 1].price == msg.value, "Please pay the exact amount!");
-        require(products[_productId - 1].seller != msg.sender, "Seller cannot buy the product");
-        products[_productId - 1].buyer = msg.sender;
         console.log("Buyer: ", msg.sender);
         emit bought(_productId, msg.sender);
     }
@@ -98,7 +102,6 @@ contract Warranty  is ERC721URIStorage {
         products[_productId - 1].delivered = true;
         products[_productId - 1].seller.transfer(products[_productId - 1].price);
         emit delivered(_productId);
-        
     }
 
     
