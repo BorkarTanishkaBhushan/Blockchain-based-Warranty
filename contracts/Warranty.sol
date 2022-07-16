@@ -4,15 +4,17 @@ pragma solidity >=0.5.0 < 0.9.0;
 //imports
 import "hardhat/console.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
+
 import "@openzeppelin/contracts/utils/Counters.sol";
 import {Base64} from "./libraries/Base64.sol";
 
-contract Warranty  is ERC721URIStorage {
+contract Warranty  is  ERC721URIStorage {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
 
-    constructor(string memory _name) payable ERC721("Product Warranty", "blockchian--based") {
+    constructor(string memory _name) payable ERC721("Product Warranty", "blockchain--based") {
     console.log("%s service deployed", _name);
     }
 
@@ -38,7 +40,8 @@ contract Warranty  is ERC721URIStorage {
     uint counter = 1;
     //array of product type named as products
     Product[] public products;
-
+    //productId to tokenID
+    mapping(uint => uint) p_tokenid; 
     event registered(string title, uint productId, address seller);
     event bought(uint productId, address buyer);
     event delivered(uint productId);
@@ -54,7 +57,9 @@ contract Warranty  is ERC721URIStorage {
         tempProduct.seller = payable(msg.sender);
         tempProduct.productId = counter;
         tempProduct.warrantyStartTime = block.timestamp;
-        tempProduct.warrantyExpiryTime = block.timestamp + _warrantyPeriodDays * 86400;
+        // tempProduct.warrantyExpiryTime = block.timestamp + _warrantyPeriodDays * 86400;
+        tempProduct.warrantyExpiryTime = block.timestamp + 100; //tempo statement
+
         products.push(tempProduct);
         
 
@@ -74,20 +79,20 @@ contract Warranty  is ERC721URIStorage {
         uint256 newRecordId = _tokenIds.current();
         console.log("Registering product with serial no %s on the contract with tokenID %d", _prodSerialNoInStr, newRecordId);
 
-        
+        p_tokenid[_productId] = newRecordId;
 
-    // Create the JSON metadata of our NFT. We do this by combining strings and encoding as base64
-    string memory json = Base64.encode(
-      abi.encodePacked(
-        '{"title": "',
-        products[_productId - 1].title,
-        '", "description": "Blockchain-based-Warranty", "image": "data:image/svg+xml;base64,',
-        Base64.encode(bytes(finalSvg)),
-        '","serialno":"',
-        _prodSerialNoInStr,
-        '"}'
-    )
-    );
+        // Create the JSON metadata of our NFT. We do this by combining strings and encoding as base64
+        string memory json = Base64.encode(
+        abi.encodePacked(
+            '{"title": "',
+            products[_productId - 1].title,
+            '", "description": "Blockchain-based-Warranty", "image": "data:image/svg+xml;base64,',
+            Base64.encode(bytes(finalSvg)),
+            '","serialno":"',
+            _prodSerialNoInStr,
+            '"}'
+        )
+        );
 
         string memory finalTokenUri = string( abi.encodePacked("data:application/json;base64,", json));
 
@@ -112,5 +117,10 @@ contract Warranty  is ERC721URIStorage {
     }
 
 
-    
+    // function burn (uint _productId) public {
+    //     require(block.timestamp == products[_productId - 1].warrantyExpiryTime);
+    //     uint temp = p_tokenid[_productId];
+    //     super._burn(temp);
+    //     console.log("NFT burned with productId: ", _productId);
+    // }
 }

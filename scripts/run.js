@@ -23,6 +23,11 @@ const main = async () => {
     const d_tx = await warrantyContract.connect(randomPerson).delivery(1);
     await d_tx.wait();
     console.log("Done delivered");
+
+    //burn transaction
+    // const burn_tx = await warrantyContract.connect(randomPerson).burn(1);
+    // await burn_tx.wait();
+    // console.log("Done burned");
 }
 
 const runMain = async () => {
